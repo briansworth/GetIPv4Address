@@ -45,7 +45,38 @@ Function ConvertIntToIPv4 {
   }
 }
 
-Function AddToIPv4Address {
+<#
+.SYNOPSIS
+Add an integer to an IP Address and get the new IP Address.
+
+.DESCRIPTION
+Add an integer to an IP Address and get the new IP Address.
+
+.PARAMETER IPv4Address
+The IP Address to add an integer to.
+
+.PARAMETER Integer
+An integer to add to the IP Address. Can be a positive or negative number.
+
+.EXAMPLE
+Add-IntToIPv4Address -IPv4Address 10.10.0.252 -Integer 10
+
+10.10.1.6
+
+Description
+-----------
+This command will add 10 to the IP Address 10.10.0.1 and return the new IP Address.
+
+.EXAMPLE
+Add-IntToIPv4Address -IPv4Address 192.168.1.28 -Integer -100
+
+192.168.0.184
+
+Description
+-----------
+This command will subtract 100 from the IP Address 192.168.1.28 and return the new IP Address.
+#>
+Function Add-IntToIPv4Address {
   Param(
     [String]$IPv4Address,
 
@@ -197,11 +228,11 @@ Function Get-IPv4Subnet {
       $networkID=ConvertIntToIPv4 -Integer ($netMaskInt -band $ipInt)
 
       $maxHosts=[math]::Pow(2,(32-$PrefixLength)) - 2
-      $broadcast=AddToIPv4Address -IPv4Address $networkID `
+      $broadcast=Add-IntToIPv4Address -IPv4Address $networkID `
         -Integer ($maxHosts+1)
 
-      $firstIP=AddToIPv4Address -IPv4Address $networkID -Integer 1
-      $lastIP=AddToIPv4Address -IPv4Address $broadcast -Integer -1
+      $firstIP=Add-IntToIPv4Address -IPv4Address $networkID -Integer 1
+      $lastIP=Add-IntToIPv4Address -IPv4Address $broadcast -Integer -1
 
       if($PrefixLength -eq 32){
         $broadcast=$networkID
@@ -235,4 +266,4 @@ Function Get-IPv4Subnet {
   End{}
 }
 
-Export-ModuleMember -Function Get-IPv4Subnet, Convert-IPv4AddressToBinaryString
+Export-ModuleMember -Function Get-IPv4Subnet, Convert-IPv4AddressToBinaryString, Add-IntToIPv4Address
