@@ -9,7 +9,7 @@ Function Convert-IPv4AddressToBinaryString
   foreach($byte in $addressBytes)
   {
     $8bitString = [Convert]::ToString($byte,2).PadRight(8,'0')
-    [void]$strBuilder.Append($8bitString)
+    $null = $strBuilder.Append($8bitString)
   }
   Write-Output -InputObject $strBuilder.ToString()
 }
@@ -89,9 +89,9 @@ Function Add-IntToIPv4Address
       This command will subtract 100 from the IP Address 192.168.1.28 and return the new IP Address.
   #>
   Param(
-    [String]$IPv4Address,
+    [Parameter(Mandatory=$true)][String]$IPv4Address,
 
-    [int64]$Integer
+    [Parameter(Mandatory=$true)][int64]$Integer
   )
   Try
   {
@@ -122,7 +122,7 @@ Function Convert-CIDRToNetMask
   for($i = 0;$i -lt 32;$i += 8)
   {
     $8bitString = $bitString.Substring($i,8)
-    [void]$strBuilder.Append("$([Convert]::ToInt32($8bitString,2)).")
+    $null = $strBuilder.Append(('{0}.' -f [Convert]::ToInt32($8bitString,2)))
   }
 
   $strBuilder.ToString().TrimEnd('.')
@@ -135,7 +135,7 @@ Function Convert-NetMaskToCIDR
     [String]$SubnetMask = '255.255.255.0'
   )
   $byteRegex = '^(0|128|192|224|240|248|252|254|255)$'
-  $invalidMaskMsg = "Invalid SubnetMask specified [$SubnetMask]"
+  $invalidMaskMsg = ('Invalid SubnetMask specified [{0}]' -f $SubnetMask)
   Try
   {
     $netMaskIP = [IPAddress]$SubnetMask
@@ -160,7 +160,7 @@ Function Convert-NetMaskToCIDR
         -ErrorAction Stop
       }
 
-      [void]$strBuilder.Append([Convert]::ToString($byte,2))
+      $null = $strBuilder.Append([Convert]::ToString($byte,2))
       $lastByte = $byte
     }
 
@@ -229,10 +229,10 @@ Function Get-IPv4Subnet
     [Parameter(Mandatory = $true,Position = 0)]
     [IPAddress]$IPAddress,
 
-    [Parameter(Position = 1,ParameterSetName = 'PrefixLength')]
+    [Parameter(Mandatory=$false,Position = 1,ParameterSetName = 'PrefixLength')]
     [Int16]$PrefixLength = 24,
 
-    [Parameter(Position = 1,ParameterSetName = 'SubnetMask')]
+    [Parameter(Mandatory=$true,Position = 1,ParameterSetName = 'SubnetMask')]
     [IPAddress]$SubnetMask
   )
   Begin{}
@@ -260,7 +260,7 @@ Function Get-IPv4Subnet
       -Integer ($maxHosts+1)
 
       $firstIP = Add-IntToIPv4Address -IPv4Address $networkID -Integer 1
-      $lastIP = Add-IntToIPv4Address -IPv4Address $broadcast -Integer -1
+      $lastIP = Add-IntToIPv4Address -IPv4Address $broadcast -Integer (-1)
 
       if($PrefixLength -eq 32)
       {
@@ -277,7 +277,7 @@ Function Get-IPv4Subnet
         MemberType  = 'NoteProperty'
         Force       = $true
       }
-      Add-Member @memberParam -Name CidrID -Value "$networkID/$PrefixLength"
+      Add-Member @memberParam -Name CidrID -Value ('{0}/{1}' -f $networkID, $PrefixLength)
       Add-Member @memberParam -Name NetworkID -Value $networkID
       Add-Member @memberParam -Name SubnetMask -Value $SubnetMask
       Add-Member @memberParam -Name PrefixLength -Value $PrefixLength
@@ -286,7 +286,7 @@ Function Get-IPv4Subnet
       Add-Member @memberParam -Name LastHostIP -Value $lastIP
       Add-Member @memberParam -Name Broadcast -Value $broadcast
 
-      Write-Output $outputObject
+      Write-Output -InputObject $outputObject
     }
     Catch
     {
