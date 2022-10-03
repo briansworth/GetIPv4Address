@@ -173,6 +173,40 @@ Function Convert-NetMaskToCIDR
   }
 }
 
+function Get-CidrFromHostCount
+{
+  <#
+      .SYNOPSIS
+      Returns the CIDR number for a host count that will support the number of hosts you entered.
+  #>
+  [OutputType([Int])]
+  param(
+    [Parameter(Mandatory,ValueFromPipeline,HelpMessage = 'Integer between 1 - 4294967293')]
+    [ValidateScript({
+          $_ -gt 0
+    })]
+    [long]$HostCount
+  )
+  Begin{}
+  Process{
+    #Calculate available host addresses 
+    $i = $MaxHosts = 0
+    do
+    {
+      $i++
+      $MaxHosts = ([math]::Pow(2,$i) - 2)
+      $Prefix = 32 - $i 
+    }
+    until ($MaxHosts -ge $HostCount)
+  }
+  End{
+    $PrefixLength = [PSCustomObject]@{
+      PrefixLength = $Prefix
+    }
+    $PrefixLength
+  }
+}
+
 Function Get-IPv4Subnet 
 {
   <#
@@ -303,4 +337,4 @@ Function Get-IPv4Subnet
   End{}
 }
 
-Export-ModuleMember -Function Get-IPv4Subnet, Convert-IPv4AddressToBinaryString, Add-IntToIPv4Address, Convert-CIDRToNetMask, Convert-NetMaskToCIDR 
+Export-ModuleMember -Function Get-IPv4Subnet, Convert-IPv4AddressToBinaryString, Add-IntToIPv4Address, Convert-CIDRToNetMask, Convert-NetMaskToCIDR, Get-CidrFromHostCount 
