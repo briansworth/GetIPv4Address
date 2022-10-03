@@ -226,13 +226,19 @@ Function Get-IPv4Subnet
   #>
   [CmdletBinding(DefaultParameterSetName = 'PrefixLength')]
   Param(
-    [Parameter(Mandatory = $true,Position = 0)]
+    [Parameter(Mandatory = $true,
+        ValueFromPipeline = $true,
+        ValueFromPipelineByPropertyName = $true,
+        ValueFromRemainingArguments = $false,
+        HelpMessage = 'IP Address in the form of XXX.XXX.XXX.XXX',
+    Position = 0)]
     [IPAddress]$IPAddress,
 
-    [Parameter(Mandatory=$false,Position = 1,ParameterSetName = 'PrefixLength')]
+    [Parameter(Position = 1,ParameterSetName = 'PrefixLength',ValueFromPipeline = $true,
+    ValueFromPipelineByPropertyName = $true)]
     [Int16]$PrefixLength = 24,
 
-    [Parameter(Mandatory=$true,Position = 1,ParameterSetName = 'SubnetMask')]
+    [Parameter(Mandatory = $true,Position = 1,ParameterSetName = 'SubnetMask')]
     [IPAddress]$SubnetMask
   )
   Begin{}
