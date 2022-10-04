@@ -121,6 +121,7 @@ Function Convert-CIDRToNetMask
 
       .EXAMPLE
       Convert-CIDRToNetMask -PrefixLength 26
+    
       Returns: 255.255.255.192/26
 
       .NOTES
