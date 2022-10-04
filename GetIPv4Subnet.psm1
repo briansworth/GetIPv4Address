@@ -1,5 +1,10 @@
 Function Convert-IPv4AddressToBinaryString 
 {
+  <#
+      .SYNOPSIS
+      Converts an IP v4 Address to Binary String 
+  #>
+
   Param(
     [IPAddress]$IPAddress = '0.0.0.0'
   )
@@ -110,7 +115,21 @@ Function Add-IntToIPv4Address
 
 Function Convert-CIDRToNetMask 
 {
+  <#
+      .SYNOPSIS
+      Converts a CIDR to a netmask
+
+      .EXAMPLE
+      Convert-CIDRToNetMask -PrefixLength 26
+      Returns: 255.255.255.192/26
+
+      .NOTES
+      To convert back use "Convert-NetMaskToCIDR" 
+  #>
+
+
   [CmdletBinding()]
+  [Alias('ToMask')]
   Param(
     [ValidateRange(0,32)]
     [int16]$PrefixLength = 0
@@ -130,7 +149,22 @@ Function Convert-CIDRToNetMask
 
 Function Convert-NetMaskToCIDR 
 {
+  <#
+      .SYNOPSIS
+      Converts a netmask to a CIDR
+
+      .EXAMPLE
+      Convert-NetMaskToCIDR -SubnetMask 255.255.255.192
+    
+      Returns: 26
+
+      .NOTES
+      To convert back use "Convert-CIDRToNetMask" 
+  #>
+
+
   [CmdletBinding()]
+  [Alias('ToCIDR')]
   Param(
     [String]$SubnetMask = '255.255.255.0'
   )
@@ -256,6 +290,7 @@ Function Get-IPv4Subnet
       Description
       -----------
       This command will get the subnet information about the IPAddress 10.3.40.54, with the subnet prefix length of 25.
+      Prefix length specifies the number of bits in the IP address that are to be used as the subnet mask.
 
   #>
   [CmdletBinding(DefaultParameterSetName = 'PrefixLength')]
@@ -273,12 +308,26 @@ Function Get-IPv4Subnet
     [Int16]$PrefixLength = 24,
 
     [Parameter(Mandatory = $true,Position = 1,ParameterSetName = 'SubnetMask')]
-    [IPAddress]$SubnetMask
+    [IPAddress]$SubnetMask,
+    
+    [Parameter(Mandatory = $true,Position = 1,ParameterSetName = 'Hosts',
+        HelpMessage = 'Number of hosts in need of IP Addresses')]
+    [Int64]$HostCount
   )
   Begin{}
   Process{
     Try
     {
+      if($PrefixLength)
+      {
+        $MaxHosts = [math]::Pow(2,(32-$PrefixLength)) - 2
+      }
+      if($HostCount)
+      {
+        $PrefixLength = (Get-CidrFromHostCount -HostCount $HostCount).PrefixLength
+        $MaxHosts = [math]::Pow(2,(32-$PrefixLength)) - 2
+      }
+      
       if($PSCmdlet.ParameterSetName -eq 'SubnetMask')
       {
         $PrefixLength = Convert-NetMaskToCIDR -SubnetMask $SubnetMask `
@@ -295,7 +344,6 @@ Function Get-IPv4Subnet
       
       $networkID = ConvertIntToIPv4 -Integer ($netMaskInt -band $ipInt)
 
-      $maxHosts = [math]::Pow(2,(32-$PrefixLength)) - 2
       $broadcast = Add-IntToIPv4Address -IPv4Address $networkID `
       -Integer ($maxHosts+1)
 
@@ -337,4 +385,4 @@ Function Get-IPv4Subnet
   End{}
 }
 
-Export-ModuleMember -Function Get-IPv4Subnet, Convert-IPv4AddressToBinaryString, Add-IntToIPv4Address, Convert-CIDRToNetMask, Convert-NetMaskToCIDR, Get-CidrFromHostCount 
+Export-ModuleMember -Function Get-IPv4Subnet, Convert-NetMaskToCIDR, Convert-CIDRToNetMask, Add-IntToIPv4Address, Get-CidrFromHostCount, Convert-IPv4AddressToBinaryString
