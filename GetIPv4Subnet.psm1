@@ -94,9 +94,9 @@ Function Add-IntToIPv4Address
       This command will subtract 100 from the IP Address 192.168.1.28 and return the new IP Address.
   #>
   Param(
-    [Parameter(Mandatory=$true)][String]$IPv4Address,
+    [Parameter(Mandatory = $true)][String]$IPv4Address,
 
-    [Parameter(Mandatory=$true)][int64]$Integer
+    [Parameter(Mandatory = $true)][int64]$Integer
   )
   Try
   {
@@ -312,7 +312,7 @@ Function Get-IPv4Subnet
     [IPAddress]$SubnetMask,
     
     [Parameter(Mandatory = $true,Position = 1,ParameterSetName = 'Hosts',
-        HelpMessage = 'Number of hosts in need of IP Addresses')]
+    HelpMessage = 'Number of hosts in need of IP Addresses')]
     [Int64]$HostCount
   )
   Begin{}
@@ -346,7 +346,7 @@ Function Get-IPv4Subnet
       $networkID = ConvertIntToIPv4 -Integer ($netMaskInt -band $ipInt)
 
       $broadcast = Add-IntToIPv4Address -IPv4Address $networkID `
-      -Integer ($maxHosts+1)
+      -Integer ($MaxHosts+1)
 
       $firstIP = Add-IntToIPv4Address -IPv4Address $networkID -Integer 1
       $lastIP = Add-IntToIPv4Address -IPv4Address $broadcast -Integer (-1)
@@ -356,7 +356,7 @@ Function Get-IPv4Subnet
         $broadcast = $networkID
         $firstIP = $null
         $lastIP = $null
-        $maxHosts = 0
+        $MaxHosts = 0
       }
 
       $outputObject = New-Object -TypeName PSObject 
@@ -370,7 +370,7 @@ Function Get-IPv4Subnet
       Add-Member @memberParam -Name NetworkID -Value $networkID
       Add-Member @memberParam -Name SubnetMask -Value $SubnetMask
       Add-Member @memberParam -Name PrefixLength -Value $PrefixLength
-      Add-Member @memberParam -Name HostCount -Value $maxHosts
+      Add-Member @memberParam -Name HostCount -Value $MaxHosts
       Add-Member @memberParam -Name FirstHostIP -Value $firstIP
       Add-Member @memberParam -Name LastHostIP -Value $lastIP
       Add-Member @memberParam -Name Broadcast -Value $broadcast
