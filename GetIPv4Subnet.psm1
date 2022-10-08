@@ -242,6 +242,83 @@ function Get-CidrFromHostCount
   }
 }
 
+function Get-SubnetCheatSheet
+{
+  <#
+      .SYNOPSIS
+      Creates a little cheatsheet for subnets.
+
+      .DESCRIPTION
+      Creates a little cheatsheet for subnets to the console or send it to a file such as a CSV for opening in a spreadsheet.
+
+      .PARAMETER ToConsole
+      Sends the whole formatted table to the console
+
+      .EXAMPLE
+      Get-SubnetCheatSheet | Where-Object {($_.CIDR -gt 15) -and ($_.CIDR -lt 22)} | Select-Object CIDR,Netmask
+
+      .EXAMPLE
+      Get-SubnetCheatSheet -ToConsole 
+
+      .EXAMPLE
+      Get-SubnetCheatSheet | Export-Csv .\SubnetSheet.csv -NoTypeInformation
+      Sends the data to a csv file
+
+      .EXAMPLE
+      Get-SubnetCheatSheetGet-SubnetTable | Where-Object {$_.NetMask -like '255.255.*.0' }
+      Selects only one class of subnets
+  #>
+  [CmdletBinding()]
+  param(
+    [Switch]$ToConsole
+  )
+  Begin{
+    $OutputFormatting = '{0,4} | {1,13:#,#} | {2,13:#,#} | {3,-15} | '
+    $CheatSheet = @()
+  }
+  Process{
+    for($CIDR = 32;$CIDR -gt 0;$CIDR--)
+    {
+      $netmask = Convert-CIDRToNetMask -PrefixLength $CIDR
+      $Addresses = [math]::Pow(2,32-$CIDR)
+      $HostCount = (&{
+          if($Addresses -le 2)
+          {
+            '0'
+          }
+          else
+          {
+            $Addresses -2
+          }
+      })
+  
+      $hash = [PsCustomObject]@{
+        CIDR      = $CIDR
+        NetMask   = $netmask
+        HostCount = $HostCount
+        Addresses = $Addresses
+      }
+      $CheatSheet += $hash
+    }
+  }
+  End{
+    if($ToConsole)
+    {
+      $OutputFormatting  -f 'CIDR', 'Host Count', 'Addresses', 'NetMask'
+      '='*55
+      foreach($item in $CheatSheet)
+      {
+        $OutputFormatting -f $item.CIDR, $item.HostCount, $item.Addresses, $item.NetMask
+      }
+    }
+    Else
+    {
+      $CheatSheet
+    }
+  }
+}
+
+
 Function Get-IPv4Subnet 
 {
   <#
@@ -386,4 +463,6 @@ Function Get-IPv4Subnet
   End{}
 }
 
-Export-ModuleMember -Function Get-IPv4Subnet, Convert-NetMaskToCIDR, Convert-CIDRToNetMask, Add-IntToIPv4Address, Get-CidrFromHostCount, Convert-IPv4AddressToBinaryString
+
+
+Export-ModuleMember -Function Get-SubnetCheatSheet,Get-IPv4Subnet, Convert-NetMaskToCIDR, Convert-CIDRToNetMask, Add-IntToIPv4Address, Get-CidrFromHostCount, Convert-IPv4AddressToBinaryString
