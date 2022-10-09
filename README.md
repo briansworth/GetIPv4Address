@@ -8,6 +8,8 @@ IP addressing, subnets and so much more
 - Add-IntToIPv4Address
 - Get-CidrFromHostCount
 - Convert-IPv4AddressToBinaryString
+- Ping-IpRange
+
 
 
 #### Convert-IPv4AddressToBinaryString
@@ -37,7 +39,7 @@ Converts a netmask to a CIDR
 Creates a little cheatsheet for subnets to the console or send it to a file such as a CSV for opening in a spreadsheet.
 
     CIDR |    Host Count |     Addresses | NetMask       
-    ===============================
+    ========================================================
       32 |             0 |             1 | 255.255.255.255 | 
       31 |             0 |             2 | 255.255.255.254 | 
       30 |             2 |             4 | 255.255.255.252 | 
@@ -58,3 +60,15 @@ The primary function for this tools set.  The function gets information about an
       FirstHostIP  : 192.168.0.1
       LastHostIP   : 192.168.127.254
       Broadcast    : 192.168.127.255
+
+#### Ping-IpRange
+Pings through the range of IP addresses based on the First and Last Address provided.
+
+      Address      Available
+      -------      ---------
+      192.168.0.22     False
+      192.168.0.23     False
+      192.168.0.25     False
+      192.168.0.20      True
+      192.168.0.21      True
+      192.168.0.24      True
