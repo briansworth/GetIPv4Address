@@ -284,7 +284,7 @@ function Get-SubnetCheatSheet
       Selects only one class of subnets
   #>
   [CmdletBinding()]
-  [Alias('Subnets')]
+  [Alias('SubnetList','ListSubnets')]
   param(
     [Switch]$Raw
   )
@@ -334,7 +334,6 @@ function Get-SubnetCheatSheet
     }
   }
 }
-
 
 function Ping-IpRange
 {
