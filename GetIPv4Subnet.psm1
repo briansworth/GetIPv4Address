@@ -1,22 +1,37 @@
-Function Convert-IPv4AddressToBinaryString 
+function Convert-IPv4AddresstoBinary
 {
   <#
       .SYNOPSIS
-      Converts an IP v4 Address to Binary String 
+      Converts an IP v4 Address to a binary string 
+
+      .DESCRIPTION
+      IPv4 Addresses are 32 bit addresses written in four bytes (Octets) separated by dots like 192.168.2.1.
+      This function converts each of those Octets to binary, then concatinates those into a 32 bit string without the dots. 
+ 
+      .EXAMPLE
+      Convert-IPAddresstoBinary -IPAddress 4.3.2.1
+      
+      Returns:
+      00000100000000110000001000000001
+
+      .INPUTS
+      v4 IpAddress
+
+      .OUTPUTS
+      String
   #>
 
-  Param(
-    [IPAddress]$IPAddress = '0.0.0.0'
+  param
+  (
+    [Parameter(Mandatory,HelpMessage = 'v4 IP Address as "192.168.10.25"')]
+    [ipaddress]$IPAddress
   )
   $addressBytes = $IPAddress.GetAddressBytes()
 
-  $strBuilder = New-Object -TypeName Text.StringBuilder
-  foreach($byte in $addressBytes)
-  {
-    $8bitString = [Convert]::ToString($byte,2).PadRight(8,'0')
-    $null = $strBuilder.Append($8bitString)
+  $addressBytes | ForEach-Object -Process {
+    $binary = $binary + $([convert]::toString($_,2).padleft(8,'0'))
   }
-  Write-Output -InputObject $strBuilder.ToString()
+  return $binary
 }
 
 Function ConvertIPv4ToInt 
@@ -242,6 +257,165 @@ function Get-CidrFromHostCount
   }
 }
 
+<<<<<<< Updated upstream
+=======
+function Get-SubnetCheatSheet
+{
+  <#
+      .SYNOPSIS
+      Creates a little cheatsheet for subnets.
+
+      .DESCRIPTION
+      Creates a little cheatsheet for subnets to the console or send it to a file such as a CSV for opening in a spreadsheet.
+
+      .PARAMETER ToConsole
+      Sends the whole formatted table to the console
+
+      .EXAMPLE
+      Get-SubnetCheatSheet | Where-Object {($_.CIDR -gt 15) -and ($_.CIDR -lt 22)} | Select-Object CIDR,Netmask
+
+      .EXAMPLE
+      Get-SubnetCheatSheet -ToConsole 
+
+      .EXAMPLE
+      Get-SubnetCheatSheet | Export-Csv .\SubnetSheet.csv -NoTypeInformation
+      Sends the data to a csv file
+
+      .EXAMPLE
+      Get-SubnetCheatSheetGet-SubnetTable | Where-Object {$_.NetMask -like '255.255.*.0' }
+      Selects only one class of subnets
+  #>
+  [CmdletBinding()]
+  [Alias('Subnets')]
+  param(
+    [Switch]$Raw
+  )
+  Begin{
+    $OutputFormatting = '{0,4} | {1,13:#,#} | {2,13:#,#} | {3,-15}  '
+    $CheatSheet = @()
+  }
+  Process{
+    for($CIDR = 32;$CIDR -gt 0;$CIDR--)
+    {
+      $netmask = Convert-CIDRToNetMask -PrefixLength $CIDR
+      $Addresses = [math]::Pow(2,32-$CIDR)
+      $HostCount = (&{
+          if($Addresses -le 2)
+          {
+            '0'
+          }
+          else
+          {
+            $Addresses -2
+          }
+      })
+  
+      $hash = [PsCustomObject]@{
+        CIDR      = $CIDR
+        NetMask   = $netmask
+        HostCount = $HostCount
+        Addresses = $Addresses
+      }
+      $CheatSheet += $hash
+    }
+  }
+  End{
+    if(-not $Raw)
+    {
+      $OutputFormatting  -f 'CIDR', 'Host Count', 'Addresses', 'NetMask'
+      '='*55
+      foreach($item in $CheatSheet)
+      {
+        $OutputFormatting -f $item.CIDR, $item.HostCount, $item.Addresses, $item.NetMask
+      }
+    }
+    Else
+    {
+      $CheatSheet
+    }
+  }
+}
+
+function Ping-IpRange
+{
+  <#
+      .SYNOPSIS
+      Tests a range of Ip addresses.
+
+      .DESCRIPTION
+      A simple function to test a range of Ip addresses and returns the results to the screen. It returns an object, so you can sort and filter.
+
+      .PARAMETER FirstAddress
+      First address to test.
+
+      .PARAMETER LastAddress
+      Last address to test.
+
+      .EXAMPLE
+      Ping-IpRange -FirstAddress 192.168.0.20 -LastAddress 192.168.0.25 | sort available
+
+      Address      Available
+      -------      ---------
+      192.168.0.22     False
+      192.168.0.23     False
+      192.168.0.25     False
+      192.168.0.20      True
+      192.168.0.21      True
+      192.168.0.24      True
+    
+      .EXAMPLE
+      Ping-IpRangeNew -FirstAddress 192.168.0.20 -LastAddress 192.168.0.50 | Where Available -EQ $true
+
+      Address      Available
+      -------      ---------
+      192.168.0.20      True
+      192.168.0.21      True
+      192.168.0.24      True
+      192.168.0.43      True
+
+
+      .OUTPUTS
+      Object to console
+  #>
+  [CmdletBinding()]
+  [Alias("pingr")]
+  Param(
+    [Parameter(Mandatory,HelpMessage = 'Ip Address to start from',Position = 0)]
+    [ipaddress]$FirstAddress,
+    [Parameter(Mandatory,HelpMessage = 'Ip Address to stop at',Position = 1)]
+    [ipaddress]$LastAddress
+  )
+
+  $Startip = ConvertIPv4ToInt -IPv4Address $FirstAddress.IPAddressToString
+  $endip = ConvertIPv4ToInt -IPv4Address $LastAddress.IPAddressToString
+  $PingRange = @()
+    
+  Try
+  {
+    $ProgressCount = $endip - $Startip
+    $j = 0
+    for($i = $Startip;$i -le $endip;$i++)
+    {
+      $ip = ConvertIntToIPv4 -Integer $i
+      $Response = [PSCustomObject]@{
+        Address   = $ip
+        Available = (Test-Connection -ComputerName $ip -Count 1 -Quiet -TimeToLive 20)
+      }
+
+      Write-Progress -Activity ('Ping {0}' -f $ip) -PercentComplete ($j / $ProgressCount*100)
+      $j++
+
+      $PingRange += $Response
+    }
+  }
+  Catch
+  {
+    Write-Error -Exception $_.Exception -Category $_.CategoryInfo.Category
+  }
+  $PingRange
+}
+
+>>>>>>> Stashed changes
 Function Get-IPv4Subnet 
 {
   <#
@@ -386,4 +560,10 @@ Function Get-IPv4Subnet
   End{}
 }
 
+<<<<<<< Updated upstream
 Export-ModuleMember -Function Get-IPv4Subnet, Convert-NetMaskToCIDR, Convert-CIDRToNetMask, Add-IntToIPv4Address, Get-CidrFromHostCount, Convert-IPv4AddressToBinaryString
+=======
+
+# The line below "Export-ModuleMember" must be the last line in the script.
+Export-ModuleMember -Alias * -Function Get-IPv4Subnet, Convert-NetMaskToCIDR, Convert-CIDRToNetMask, Add-IntToIPv4Address, Get-CidrFromHostCount, Convert-IPv4AddressToBinary, Get-SubnetCheatSheet, Ping-IpRange
+>>>>>>> Stashed changes
