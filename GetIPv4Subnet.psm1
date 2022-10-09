@@ -1,4 +1,4 @@
-function Convert-IPv4AddresstoBinary
+function Convert-IPv4AddresstoBinaryString
 {
   <#
       .SYNOPSIS
@@ -28,10 +28,13 @@ function Convert-IPv4AddresstoBinary
   )
   $addressBytes = $IPAddress.GetAddressBytes()
 
-  $addressBytes | ForEach-Object -Process {
-    $binary = $binary + $([convert]::toString($_,2).padleft(8,'0'))
+    $strBuilder = New-Object -TypeName Text.StringBuilder
+  foreach($byte in $addressBytes)
+  {
+    $8bitString = [Convert]::ToString($byte,2).PadLeft(8,'0')
+    $null = $strBuilder.Append($8bitString)
   }
-  return $binary
+  $strBuilder.ToString()
 }
 
 Function ConvertIPv4ToInt 
