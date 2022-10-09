@@ -257,8 +257,6 @@ function Get-CidrFromHostCount
   }
 }
 
-<<<<<<< Updated upstream
-=======
 function Get-SubnetCheatSheet
 {
   <#
@@ -292,6 +290,7 @@ function Get-SubnetCheatSheet
   )
   Begin{
     $OutputFormatting = '{0,4} | {1,13:#,#} | {2,13:#,#} | {3,-15}  '
+
     $CheatSheet = @()
   }
   Process{
@@ -335,6 +334,7 @@ function Get-SubnetCheatSheet
     }
   }
 }
+
 
 function Ping-IpRange
 {
@@ -415,7 +415,6 @@ function Ping-IpRange
   $PingRange
 }
 
->>>>>>> Stashed changes
 Function Get-IPv4Subnet 
 {
   <#
@@ -560,10 +559,6 @@ Function Get-IPv4Subnet
   End{}
 }
 
-<<<<<<< Updated upstream
-Export-ModuleMember -Function Get-IPv4Subnet, Convert-NetMaskToCIDR, Convert-CIDRToNetMask, Add-IntToIPv4Address, Get-CidrFromHostCount, Convert-IPv4AddressToBinaryString
-=======
-
 # The line below "Export-ModuleMember" must be the last line in the script.
 Export-ModuleMember -Alias * -Function Get-IPv4Subnet, Convert-NetMaskToCIDR, Convert-CIDRToNetMask, Add-IntToIPv4Address, Get-CidrFromHostCount, Convert-IPv4AddressToBinary, Get-SubnetCheatSheet, Ping-IpRange
->>>>>>> Stashed changes
+
