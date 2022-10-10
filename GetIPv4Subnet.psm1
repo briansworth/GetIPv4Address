@@ -336,16 +336,6 @@ function Get-IPv4Subnet
   {
     try
     {
-      if ($PrefixLength)
-      {
-        $MaxHosts = [math]::Pow(2, (32 - $PrefixLength)) - 2
-      }
-      if ($HostCount)
-      {
-        $PrefixLength = (Get-CidrFromHostCount -HostCount $HostCount).PrefixLength
-        $MaxHosts = [math]::Pow(2, (32 - $PrefixLength)) - 2
-      }
-
       if ($PSCmdlet.ParameterSetName -eq 'SubnetMask')
       {
         $PrefixLength = Convert-NetMaskToCIDR -SubnetMask $SubnetMask `
@@ -356,6 +346,13 @@ function Get-IPv4Subnet
         $SubnetMask = Convert-CIDRToNetMask -PrefixLength $PrefixLength `
           -ErrorAction Stop
       }
+      if ($PSCmdlet.ParameterSetName -eq 'Hosts')
+      {
+        $PrefixLength = (Get-CidrFromHostCount -HostCount $HostCount).PrefixLength
+        $SubnetMask = Convert-CIDRToNetMask -PrefixLength $PrefixLength `
+          -ErrorAction Stop
+      }
+      $maxHosts = [math]::Pow(2, (32 - $PrefixLength)) - 2
 
       $netMaskInt = ConvertIPv4ToInt -IPv4Address $SubnetMask
       $ipInt = ConvertIPv4ToInt -IPv4Address $IPAddress
@@ -363,7 +360,7 @@ function Get-IPv4Subnet
       $networkID = ConvertIntToIPv4 -Integer ($netMaskInt -band $ipInt)
 
       $broadcast = Add-IntToIPv4Address -IPv4Address $networkID `
-        -Integer ($MaxHosts + 1)
+        -Integer ($maxHosts + 1)
 
       $firstIP = Add-IntToIPv4Address -IPv4Address $networkID -Integer 1
       $lastIP = Add-IntToIPv4Address -IPv4Address $broadcast -Integer (-1)
@@ -373,7 +370,7 @@ function Get-IPv4Subnet
         $broadcast = $networkID
         $firstIP = $null
         $lastIP = $null
-        $MaxHosts = 0
+        $maxHosts = 0
       }
 
       $outputObject = New-Object -TypeName PSObject
@@ -387,7 +384,7 @@ function Get-IPv4Subnet
       Add-Member @memberParam -Name NetworkID -Value $networkID
       Add-Member @memberParam -Name SubnetMask -Value $SubnetMask
       Add-Member @memberParam -Name PrefixLength -Value $PrefixLength
-      Add-Member @memberParam -Name HostCount -Value $MaxHosts
+      Add-Member @memberParam -Name HostCount -Value $maxHosts
       Add-Member @memberParam -Name FirstHostIP -Value $firstIP
       Add-Member @memberParam -Name LastHostIP -Value $lastIP
       Add-Member @memberParam -Name Broadcast -Value $broadcast
