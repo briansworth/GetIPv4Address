@@ -402,4 +402,3 @@ function ConvertIntToIPv4
   }
 }
 
-Export-ModuleMember -function Get-IPv4Subnet, Convert-NetMaskToCIDR, Convert-CIDRToNetMask, Add-IntToIPv4Address, Get-CidrFromHostCount, Convert-IPv4AddressToBinaryString
