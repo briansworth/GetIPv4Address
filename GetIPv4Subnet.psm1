@@ -1,66 +1,71 @@
-Function Convert-IPv4AddressToBinaryString 
+function Convert-IPv4AddressToBinaryString
 {
   <#
       .SYNOPSIS
-      Converts an IP v4 Address to Binary String 
-  #>
+      Converts an IPv4 Address to Binary String
 
+      .PARAMETER IPAddress
+      The IP Address to convert to a binary string representation
+
+      .EXAMPLE
+      Convert-IPv4AddressToBinaryString -IPAddress 10.130.1.52
+  #>
   Param(
     [IPAddress]$IPAddress = '0.0.0.0'
   )
   $addressBytes = $IPAddress.GetAddressBytes()
 
   $strBuilder = New-Object -TypeName Text.StringBuilder
-  foreach($byte in $addressBytes)
+  foreach ($byte in $addressBytes)
   {
-    $8bitString = [Convert]::ToString($byte,2).PadRight(8,'0')
+    $8bitString = [Convert]::ToString($byte, 2).PadRight(8, '0')
     $null = $strBuilder.Append($8bitString)
   }
-  Write-Output -InputObject $strBuilder.ToString()
+  return $strBuilder.ToString()
 }
 
-Function ConvertIPv4ToInt 
+function ConvertIPv4ToInt
 {
   [CmdletBinding()]
-  Param(
+  param(
     [String]$IPv4Address
   )
-  Try
+  try
   {
-    $IPAddress = [IPAddress]::Parse($IPv4Address)
+    $ipAddress = [IPAddress]::Parse($IPv4Address)
 
     $bytes = $IPAddress.GetAddressBytes()
     [Array]::Reverse($bytes)
 
-    [System.BitConverter]::ToUInt32($bytes,0)
+    return [BitConverter]::ToUInt32($bytes, 0)
   }
-  Catch
+  catch
   {
     Write-Error -Exception $_.Exception `
-    -Category $_.CategoryInfo.Category
+      -Category $_.CategoryInfo.Category
   }
 }
 
-Function ConvertIntToIPv4 
+function ConvertIntToIPv4
 {
   [CmdletBinding()]
-  Param(
+  param(
     [uint32]$Integer
   )
-  Try
+  try
   {
-    $bytes = [System.BitConverter]::GetBytes($Integer)
+    $bytes = [BitConverter]::GetBytes($Integer)
     [Array]::Reverse($bytes)
     ([IPAddress]($bytes)).ToString()
   }
-  Catch
+  catch
   {
     Write-Error -Exception $_.Exception `
-    -Category $_.CategoryInfo.Category
+      -Category $_.CategoryInfo.Category
   }
 }
 
-Function Add-IntToIPv4Address 
+function Add-IntToIPv4Address
 {
   <#
       .SYNOPSIS
@@ -93,27 +98,29 @@ Function Add-IntToIPv4Address
       -----------
       This command will subtract 100 from the IP Address 192.168.1.28 and return the new IP Address.
   #>
-  Param(
-    [Parameter(Mandatory = $true)][String]$IPv4Address,
-
-    [Parameter(Mandatory = $true)][int64]$Integer
+  param(
+    [Parameter(Mandatory = $true)]
+    [String]$IPv4Address
+    ,
+    [Parameter(Mandatory = $true)]
+    [int64]$Integer
   )
-  Try
+  try
   {
     $ipInt = ConvertIPv4ToInt -IPv4Address $IPv4Address `
-    -ErrorAction Stop
+      -ErrorAction Stop
     $ipInt += $Integer
 
-    ConvertIntToIPv4 -Integer $ipInt
+    return (ConvertIntToIPv4 -Integer $ipInt)
   }
-  Catch
+  catch
   {
     Write-Error -Exception $_.Exception `
-    -Category $_.CategoryInfo.Category
+      -Category $_.CategoryInfo.Category
   }
 }
 
-Function Convert-CIDRToNetMask 
+function Convert-CIDRToNetMask
 {
   <#
       .SYNOPSIS
@@ -121,34 +128,31 @@ Function Convert-CIDRToNetMask
 
       .EXAMPLE
       Convert-CIDRToNetMask -PrefixLength 26
-    
+
       Returns: 255.255.255.192/26
 
       .NOTES
-      To convert back use "Convert-NetMaskToCIDR" 
+      To convert back use "Convert-NetMaskToCIDR"
   #>
-
-
   [CmdletBinding()]
   [Alias('ToMask')]
-  Param(
-    [ValidateRange(0,32)]
+  param(
+    [ValidateRange(0, 32)]
     [int16]$PrefixLength = 0
   )
-  $bitString = ('1' * $PrefixLength).PadRight(32,'0')
-
+  $bitString = ('1' * $PrefixLength).PadRight(32, '0')
   $strBuilder = New-Object -TypeName Text.StringBuilder
 
-  for($i = 0;$i -lt 32;$i += 8)
+  for ($i = 0; $i -lt 32; $i += 8)
   {
-    $8bitString = $bitString.Substring($i,8)
-    $null = $strBuilder.Append(('{0}.' -f [Convert]::ToInt32($8bitString,2)))
+    $8bitString = $bitString.Substring($i, 8)
+    $null = $strBuilder.Append(('{0}.' -f [Convert]::ToInt32($8bitString, 2)))
   }
 
-  $strBuilder.ToString().TrimEnd('.')
+  return $strBuilder.ToString().TrimEnd('.')
 }
 
-Function Convert-NetMaskToCIDR 
+function Convert-NetMaskToCIDR
 {
   <#
       .SYNOPSIS
@@ -156,22 +160,20 @@ Function Convert-NetMaskToCIDR
 
       .EXAMPLE
       Convert-NetMaskToCIDR -SubnetMask 255.255.255.192
-    
+
       Returns: 26
 
       .NOTES
-      To convert back use "Convert-CIDRToNetMask" 
+      To convert back use "Convert-CIDRToNetMask"
   #>
-
-
   [CmdletBinding()]
   [Alias('ToCIDR')]
-  Param(
+  param(
     [String]$SubnetMask = '255.255.255.0'
   )
   $byteRegex = '^(0|128|192|224|240|248|252|254|255)$'
   $invalidMaskMsg = ('Invalid SubnetMask specified [{0}]' -f $SubnetMask)
-  Try
+  try
   {
     $netMaskIP = [IPAddress]$SubnetMask
     $addressBytes = $netMaskIP.GetAddressBytes()
@@ -179,32 +181,32 @@ Function Convert-NetMaskToCIDR
     $strBuilder = New-Object -TypeName Text.StringBuilder
 
     $lastByte = 255
-    foreach($byte in $addressBytes)
+    foreach ($byte in $addressBytes)
     {
       # Validate byte matches net mask value
-      if($byte -notmatch $byteRegex)
+      if ($byte -notmatch $byteRegex)
       {
         Write-Error -Message $invalidMaskMsg `
-        -Category InvalidArgument `
-        -ErrorAction Stop
+          -Category InvalidArgument `
+          -ErrorAction Stop
       }
-      elseif($lastByte -ne 255 -and $byte -gt 0)
+      elseif ($lastByte -ne 255 -and $byte -gt 0)
       {
         Write-Error -Message $invalidMaskMsg `
-        -Category InvalidArgument `
-        -ErrorAction Stop
+          -Category InvalidArgument `
+          -ErrorAction Stop
       }
 
-      $null = $strBuilder.Append([Convert]::ToString($byte,2))
+      $null = $strBuilder.Append([Convert]::ToString($byte, 2))
       $lastByte = $byte
     }
 
-    ($strBuilder.ToString().TrimEnd('0')).Length
+    return ($strBuilder.ToString().TrimEnd('0')).Length
   }
-  Catch
+  catch
   {
     Write-Error -Exception $_.Exception `
-    -Category $_.CategoryInfo.Category
+      -Category $_.CategoryInfo.Category
   }
 }
 
@@ -216,33 +218,35 @@ function Get-CidrFromHostCount
   #>
   [OutputType([Int])]
   param(
-    [Parameter(Mandatory,ValueFromPipeline,HelpMessage = 'Integer between 1 - 4294967293')]
-    [ValidateScript({
-          $_ -gt 0
-    })]
-    [long]$HostCount
+    [Parameter(
+      Mandatory = $true,
+      ValueFromPipeline = $true,
+      HelpMessage = 'Integer between 1 - 4294967293'
+    )]
+    [UInt32]$HostCount
   )
-  Begin{}
-  Process{
-    #Calculate available host addresses 
-    $i = $MaxHosts = 0
+  begin
+  {
+  }
+  process
+  {
+    #Calculate available host addresses
+    $i = $maxHosts = 0
     do
     {
       $i++
-      $MaxHosts = ([math]::Pow(2,$i) - 2)
-      $Prefix = 32 - $i 
+      $maxHosts = ([math]::Pow(2, $i) - 2)
+      $prefix = 32 - $i
     }
-    until ($MaxHosts -ge $HostCount)
-  }
-  End{
-    $PrefixLength = [PSCustomObject]@{
-      PrefixLength = $Prefix
+    until ($maxHosts -ge $HostCount)
+    $prefixLength = [PSCustomObject]@{
+      PrefixLength = $Prefix;
     }
-    $PrefixLength
+    return $prefixLength
   }
 }
 
-Function Get-IPv4Subnet 
+function Get-IPv4Subnet
 {
   <#
       .SYNOPSIS
@@ -252,7 +256,7 @@ Function Get-IPv4Subnet
       Get information about an IPv4 subnet based on an IP Address and a subnet mask or prefix length
 
       .PARAMETER IPAddress
-      The IP Address to use for determining subnet information. 
+      The IP Address to use for determining subnet information.
 
       .PARAMETER PrefixLength
       The prefix length of the subnet.
@@ -295,63 +299,76 @@ Function Get-IPv4Subnet
 
   #>
   [CmdletBinding(DefaultParameterSetName = 'PrefixLength')]
-  Param(
-    [Parameter(Mandatory = $true,
-        ValueFromPipeline = $true,
-        ValueFromPipelineByPropertyName = $true,
-        ValueFromRemainingArguments = $false,
-        HelpMessage = 'IP Address in the form of XXX.XXX.XXX.XXX',
-    Position = 0)]
-    [IPAddress]$IPAddress,
-
-    [Parameter(Position = 1,ParameterSetName = 'PrefixLength',ValueFromPipeline = $true,
-    ValueFromPipelineByPropertyName = $true)]
-    [Int16]$PrefixLength = 24,
-
-    [Parameter(Mandatory = $true,Position = 1,ParameterSetName = 'SubnetMask')]
-    [IPAddress]$SubnetMask,
-    
-    [Parameter(Mandatory = $true,Position = 1,ParameterSetName = 'Hosts',
-    HelpMessage = 'Number of hosts in need of IP Addresses')]
+  param(
+    [Parameter(
+      Mandatory = $true,
+      ValueFromPipeline = $true,
+      ValueFromPipelineByPropertyName = $true,
+      ValueFromRemainingArguments = $false,
+      HelpMessage = 'IP Address in the form of XXX.XXX.XXX.XXX',
+      Position = 0
+    )]
+    [IPAddress]$IPAddress
+    ,
+    [Parameter(
+      Position = 1,
+      ParameterSetName = 'PrefixLength',
+      ValueFromPipeline = $true,
+      ValueFromPipelineByPropertyName = $true
+    )]
+    [Int16]$PrefixLength = 24
+    ,
+    [Parameter(Mandatory = $true, Position = 1, ParameterSetName = 'SubnetMask')]
+    [IPAddress]$SubnetMask
+    ,
+    [Parameter(
+      Mandatory = $true,
+      Position = 1,
+      ParameterSetName = 'Hosts',
+      HelpMessage = 'Number of hosts in need of IP Addresses'
+    )]
     [Int64]$HostCount
   )
-  Begin{}
-  Process{
-    Try
+  begin
+  {
+  }
+  process
+  {
+    try
     {
-      if($PrefixLength)
+      if ($PrefixLength)
       {
-        $MaxHosts = [math]::Pow(2,(32-$PrefixLength)) - 2
+        $MaxHosts = [math]::Pow(2, (32 - $PrefixLength)) - 2
       }
-      if($HostCount)
+      if ($HostCount)
       {
         $PrefixLength = (Get-CidrFromHostCount -HostCount $HostCount).PrefixLength
-        $MaxHosts = [math]::Pow(2,(32-$PrefixLength)) - 2
+        $MaxHosts = [math]::Pow(2, (32 - $PrefixLength)) - 2
       }
-      
-      if($PSCmdlet.ParameterSetName -eq 'SubnetMask')
+
+      if ($PSCmdlet.ParameterSetName -eq 'SubnetMask')
       {
         $PrefixLength = Convert-NetMaskToCIDR -SubnetMask $SubnetMask `
-        -ErrorAction Stop
+          -ErrorAction Stop
       }
       else
       {
         $SubnetMask = Convert-CIDRToNetMask -PrefixLength $PrefixLength `
-        -ErrorAction Stop
+          -ErrorAction Stop
       }
-      
-      $netMaskInt = ConvertIPv4ToInt -IPv4Address $SubnetMask     
+
+      $netMaskInt = ConvertIPv4ToInt -IPv4Address $SubnetMask
       $ipInt = ConvertIPv4ToInt -IPv4Address $IPAddress
-      
+
       $networkID = ConvertIntToIPv4 -Integer ($netMaskInt -band $ipInt)
 
       $broadcast = Add-IntToIPv4Address -IPv4Address $networkID `
-      -Integer ($MaxHosts+1)
+        -Integer ($MaxHosts + 1)
 
       $firstIP = Add-IntToIPv4Address -IPv4Address $networkID -Integer 1
       $lastIP = Add-IntToIPv4Address -IPv4Address $broadcast -Integer (-1)
 
-      if($PrefixLength -eq 32)
+      if ($PrefixLength -eq 32)
       {
         $broadcast = $networkID
         $firstIP = $null
@@ -359,7 +376,7 @@ Function Get-IPv4Subnet
         $MaxHosts = 0
       }
 
-      $outputObject = New-Object -TypeName PSObject 
+      $outputObject = New-Object -TypeName PSObject
 
       $memberParam = @{
         InputObject = $outputObject
@@ -377,13 +394,15 @@ Function Get-IPv4Subnet
 
       Write-Output -InputObject $outputObject
     }
-    Catch
+    catch
     {
       Write-Error -Exception $_.Exception `
-      -Category $_.CategoryInfo.Category
+        -Category $_.CategoryInfo.Category
     }
   }
-  End{}
+  end
+  {
+  }
 }
 
-Export-ModuleMember -Function Get-IPv4Subnet, Convert-NetMaskToCIDR, Convert-CIDRToNetMask, Add-IntToIPv4Address, Get-CidrFromHostCount, Convert-IPv4AddressToBinaryString
+Export-ModuleMember -function Get-IPv4Subnet, Convert-NetMaskToCIDR, Convert-CIDRToNetMask, Add-IntToIPv4Address, Get-CidrFromHostCount, Convert-IPv4AddressToBinaryString
