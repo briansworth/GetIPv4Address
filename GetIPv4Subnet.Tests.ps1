@@ -1,3 +1,5 @@
+Import-Module -Name ./GetIPv4Subnet.psm1 -Force
+
 BeforeAll {
     function Assert-Ipv4SubnetIsEqual
     {
