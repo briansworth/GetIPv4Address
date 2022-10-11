@@ -128,3 +128,28 @@ Describe 'Get-IPv4Subnet' {
         }
     }
 }
+
+Describe 'Add-IntToIPv4Address' {
+    BeforeAll {
+        $ipTests = @(
+            @{'IP' = '10.0.0.0'; 'Int' = -1; 'Expected' = '9.255.255.255';}
+            @{'IP' = '0.0.0.0'; 'Int' = 257; 'Expected' = '0.0.1.1';}
+        )
+    }
+
+    It 'Successfully adds integers to an IP address' {
+        foreach ($test in $ipTests)
+        {
+            Write-Verbose "Test IP: [$($test.IP)]. Integer: [$($test.Int)]" -Verbose
+            Add-IntToIPv4Address -IPv4Address $test.IP -Integer $test.Int | Should -BeExactly $test.Expected
+        }
+    }
+
+    It 'Throws if underflow occurs' {
+        { Add-IntToIPv4Address -IPv4Address 0.0.0.0 -Integer -1 -ErrorAction Stop } | Should -Throw
+    }
+
+    It 'Throws if overflow occurs' {
+        { Add-IntToIPv4Address -IPv4Address 255.255.255.255 -Integer 1 -ErrorAction Stop } | Should -Throw
+    }
+}
