@@ -11,4 +11,9 @@ jobs:
       - name: Test GetIPv4Subnet module
         shell: pwsh
         run: |
-          Invoke-Pester -Passthru
+          Import-Module -Name Pester
+          $conf = [PesterConfiguration]::Default
+          $conf.CodeCoverage.Enabled = $true
+          $conf.Run.PassThru = $true
+          Invoke-Pester -Configuration $conf
+
