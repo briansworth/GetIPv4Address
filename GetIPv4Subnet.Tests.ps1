@@ -155,3 +155,37 @@ Describe 'Add-IntToIPv4Address' {
         { Add-IntToIPv4Address -IPv4Address 255.255.255.255 -Integer 1 -ErrorAction Stop } | Should -Throw
     }
 }
+
+Describe 'Convert-NetMaskToCIDR' {
+    BeforeAll {
+        $script:cidrTests = @(
+            @{'NetMask' = '255.255.255.255'; 'Expected' = '32';}
+            @{'NetMask' = '255.255.255.252'; 'Expected' = '30';}
+            @{'NetMask' = '255.255.255.248'; 'Expected' = '29';}
+            @{'NetMask' = '255.255.255.240'; 'Expected' = '28';}
+            @{'NetMask' = '255.255.255.224'; 'Expected' = '27';}
+            @{'NetMask' = '255.255.255.192'; 'Expected' = '26';}
+            @{'NetMask' = '255.255.255.0'; 'Expected' = '24';}
+            @{'NetMask' = '255.255.128.0'; 'Expected' = '17';}
+            @{'NetMask' = '255.255.0.0'; 'Expected' = '16';}
+            @{'NetMask' = '255.254.0.0'; 'Expected' = '15';}
+        )
+    }
+
+    It 'Successfully converts SubnetMask to CIDR prefix length' {
+        foreach ($test in $script:cidrTests)
+        {
+            Write-Verbose "Netmask: [$($test.NetMask)]" -Verbose
+            Convert-NetMaskToCIDR -SubnetMask $test.NetMask | Should -BeExactly $test.Expected
+        }
+    }
+
+    It 'Throws an exception with invalid subnet mask' {
+        $expected = "Invalid SubnetMask specified"
+
+        foreach ($netmask in @('20.0.0.0', '255.0.255.0'))
+        {
+            { Convert-NetMaskToCIDR -SubnetMask $netmask -ErrorAction Stop } | Should -Throw "$expected *$netmask*"
+        }
+    }
+}
