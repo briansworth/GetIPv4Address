@@ -361,6 +361,90 @@ function Get-CidrFromHostCount
   }
 }
 
+function Get-SubnetCheatSheet
+{
+  <#
+      .SYNOPSIS
+      Creates a little cheatsheet for subnets.
+
+      .DESCRIPTION
+      Creates and send a cheatsheet for subnets to the console or send it to a file such as a CSV for opening in a spreadsheet.
+      The default is formated for the console.  
+
+      .PARAMETER Raw
+      Use this parameter to output an object for more manipulation
+
+      .EXAMPLE
+      Get-SubnetCheatSheet  
+
+      .EXAMPLE
+      Get-SubnetCheatSheet -Raw | Where-Object {($_.CIDR -gt 15) -and ($_.CIDR -lt 22)} | Select-Object CIDR,Netmask
+      
+      .EXAMPLE
+      Get-SubnetCheatSheet -Raw | Export-Csv .\SubnetSheet.csv -NoTypeInformation
+      Sends the data to a csv file
+
+      .EXAMPLE
+      Get-SubnetCheatSheet -Raw | Where-Object {$_.NetMask -like '255.255.*.0' }
+      Selects only one class of subnets
+
+      .Example
+      Get-SubnetCheatSheet | Out-Printer -Name (Get-Printer | Out-GridView -PassThru).Name 
+  #>
+  [CmdletBinding()]
+  [Alias('SubnetList','ListSubnets')]
+  param(
+    [Switch]$Raw
+  )
+  Begin{
+    $OutputFormatting = '{0,4} | {1,13:#,#} | {2,13:#,#} | {3,-15}  '
+
+    $CheatSheet = @()
+  }
+  Process{
+    for($CIDR = 32;$CIDR -gt 0;$CIDR--)
+    {
+      $netmask = Convert-CIDRToNetMask -PrefixLength $CIDR
+      $Addresses = [math]::Pow(2,32-$CIDR)
+      $HostCount = (&{
+          if($Addresses -le 2)
+          {
+            '0'
+          }
+          else
+          {
+            $Addresses -2
+          }
+      })
+  
+      $hash = [PsCustomObject]@{
+        CIDR      = $CIDR
+        NetMask   = $netmask
+        HostCount = $HostCount
+        Addresses = $Addresses
+      }
+      $CheatSheet += $hash
+    }
+  }
+  End{
+    if(-not $Raw)
+    {
+      $OutputFormatting  -f 'CIDR', 'Host Count', 'Addresses', 'NetMask'
+      '='*55
+      foreach($item in $CheatSheet)
+      {
+        $OutputFormatting -f $item.CIDR, $item.HostCount, $item.Addresses, $item.NetMask
+      }
+    }
+    Else
+    {
+      $CheatSheet
+    }
+  }
+}
+
+
+# Non-Published Functions
 function ConvertIPv4ToInt
 {
   [CmdletBinding()]
