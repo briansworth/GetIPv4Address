@@ -351,6 +351,10 @@ function Get-CidrFromHostCount
       {
         break
       }
+      elseif ($i -eq 32)
+      {
+        break
+      }
       $i++
       $maxHosts = ([math]::Pow(2, $i) - 2)
       $prefix = 32 - $i
@@ -489,4 +493,3 @@ function ConvertIntToIPv4
       -Category $_.CategoryInfo.Category
   }
 }
-
