@@ -345,7 +345,7 @@ function Get-CidrFromHostCount
     #Calculate available host addresses
     $i = $maxHosts = 0
     $prefix = 32
-    do
+    while ($maxHosts -ge $HostCount)
     {
       if ($HostCount -eq 0)
       {
@@ -355,7 +355,6 @@ function Get-CidrFromHostCount
       $maxHosts = ([math]::Pow(2, $i) - 2)
       $prefix = 32 - $i
     }
-    until ($maxHosts -ge $HostCount)
     $prefixLength = [PSCustomObject]@{
       PrefixLength = $prefix;
     }
