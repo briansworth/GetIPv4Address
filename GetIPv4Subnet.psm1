@@ -345,7 +345,7 @@ function Get-CidrFromHostCount
     #Calculate available host addresses
     $i = $maxHosts = 0
     $prefix = 32
-    while ($maxHosts -ge $HostCount)
+    while ($maxHosts -lt $HostCount)
     {
       if ($HostCount -eq 0)
       {
