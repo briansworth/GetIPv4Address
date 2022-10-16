@@ -200,3 +200,13 @@ Describe 'Convert-NetMaskToCIDR' {
         }
     }
 }
+
+Describe 'Convert-CIDRToNetMask' {
+    It 'Successfully converts prefix length to subnet mask' {
+        foreach ($test in $script:cidrTests)
+        {
+            Write-Verbose "Prefix: [$($test.Expected)]" -Verbose
+            Convert-CIDRToNetMask -PrefixLength $test.Expected | Should -BeExactly $test.Netmask
+        }
+    }
+}
