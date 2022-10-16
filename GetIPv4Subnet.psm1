@@ -175,9 +175,6 @@ function Get-IPv4Subnet
         -Category $_.CategoryInfo.Category
     }
   }
-  end
-  {
-  }
 }
 
 function Add-IntToIPv4Address
@@ -347,15 +344,20 @@ function Get-CidrFromHostCount
   {
     #Calculate available host addresses
     $i = $maxHosts = 0
+    $prefix = 32
     do
     {
+      if ($HostCount -eq 0)
+      {
+        break
+      }
       $i++
       $maxHosts = ([math]::Pow(2, $i) - 2)
       $prefix = 32 - $i
     }
     until ($maxHosts -ge $HostCount)
     $prefixLength = [PSCustomObject]@{
-      PrefixLength = $Prefix;
+      PrefixLength = $prefix;
     }
     return $prefixLength
   }
@@ -392,16 +394,18 @@ function Get-SubnetCheatSheet
       Get-SubnetCheatSheet | Out-Printer -Name (Get-Printer | Out-GridView -PassThru).Name 
   #>
   [CmdletBinding()]
-  [Alias('SubnetList','ListSubnets')]
+  [Alias('SubnetList', 'ListSubnets')]
   param(
     [Switch]$Raw
   )
-  Begin{
+  begin
+  {
     $OutputFormatting = '{0,4} | {1,13:#,#} | {2,13:#,#} | {3,-15}  '
 
     $CheatSheet = @()
   }
-  Process{
+  process
+  {
     for($CIDR = 32;$CIDR -gt 0;$CIDR--)
     {
       $netmask = Convert-CIDRToNetMask -PrefixLength $CIDR
@@ -426,7 +430,8 @@ function Get-SubnetCheatSheet
       $CheatSheet += $hash
     }
   }
-  End{
+  end
+  {
     if(-not $Raw)
     {
       $OutputFormatting  -f 'CIDR', 'Host Count', 'Addresses', 'NetMask'
@@ -436,7 +441,7 @@ function Get-SubnetCheatSheet
         $OutputFormatting -f $item.CIDR, $item.HostCount, $item.Addresses, $item.NetMask
       }
     }
-    Else
+    else
     {
       $CheatSheet
     }

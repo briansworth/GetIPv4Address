@@ -65,6 +65,16 @@ BeforeAll {
         LastHostIP = '172.22.47.254';
         Broadcast = '172.22.47.255';
     }
+    $subnet4 = [PSCustomObject]@{
+        CidrId = '192.168.1.1/32';
+        NetworkId = '192.168.1.1';
+        SubnetMask = '255.255.255.255';
+        PrefixLength = '32';
+        HostCount = '0';
+        FirstHostIP = $null;
+        LastHostIP = $null;
+        Broadcast = '192.168.1.1';
+    }
 }
 
 Describe 'Convert-IPv4AddressToBinaryString' {
@@ -97,6 +107,7 @@ Describe 'Get-IPv4Subnet' {
             @{'IP' = '10.11.255.0'; 'Prefix' = '16'; 'NetMask' = '255.255.0.0'; 'HostCount' = '65534'; 'Example' = $subnet2;}
             @{'IP' = '172.22.32.0'; 'Prefix' = '20'; 'NetMask' = '255.255.240.0'; 'HostCount' = '4094'; 'Example' = $subnet3;}
             @{'IP' = '172.22.47.254'; 'Prefix' = '20'; 'NetMask' = '255.255.240.0'; 'HostCount' = '4090'; 'Example' = $subnet3;}
+            @{'IP' = '192.168.1.1'; 'Prefix' = '32'; 'NetMask' = '255.255.255.255'; 'HostCount' = '0'; 'Example' = $subnet4;}
         )
     }
 
