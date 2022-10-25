@@ -71,9 +71,11 @@ Creates a little cheatsheet for subnets to the console or send it to a file such
 #### Find-MTUSize
 Finds the MTU size being used on the network.
 
- MTU
- ---
+```
+MTU
+----
 1500
+```
 
 
 #### Ping-IpRange
@@ -88,3 +90,4 @@ Pings through the range of IP addresses based on the First and Last Address prov
       192.168.0.21      True
       192.168.0.24      True
       
+
