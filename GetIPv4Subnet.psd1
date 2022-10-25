@@ -66,7 +66,7 @@ Copyright = '(c) Brian Farnsworth. All rights reserved.'
 # FormatsToProcess = @()
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-# NestedModules = @()
+NestedModules = @('.\Modules\IPv4PingRange.psm1','.\Modules\GetIPv4Subnet.psm1')
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = @(
@@ -76,7 +76,9 @@ FunctionsToExport = @(
   'Convert-NetMaskToCIDR'
   'Get-CIDRFromHostCount'
   'Get-IPv4Subnet'
+  'Ping-IpRange'
   'Get-SubnetCheatSheet'
+  'Find-MtuSize'
 )
 
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
@@ -86,7 +88,7 @@ CmdletsToExport = @()
 VariablesToExport = @()
 
 # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-AliasesToExport = @('SubnetList','ListSubnets','ToCIDR','ToMask')
+AliasesToExport = @('pingr','SubnetList','ListSubnets','ToCIDR','ToMask')
 
 # DSC resources to export from this module
 # DscResourcesToExport = @()
