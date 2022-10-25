@@ -12,6 +12,19 @@ IP addressing, subnets and so much more
 
 
 
+#### Get-IPv4Subnet
+The primary function for this tools set.  The function gets information about an IPv4 subnet based on an IP Address and a subnet mask or prefix length
+
+      CidrID       : 192.168.0.0/17
+      NetworkID    : 192.168.0.0
+      SubnetMask   : 255.255.128.0
+      PrefixLength : 17
+      HostCount    : 32766
+      FirstHostIP  : 192.168.0.1
+      LastHostIP   : 192.168.127.254
+      Broadcast    : 192.168.127.255
+      
+      
 #### Convert-IPv4AddressToBinaryString
 Converts an IP v4 Address to Binary String 
 
@@ -49,18 +62,6 @@ Creates a little cheatsheet for subnets to the console or send it to a file such
       26 |            62 |            64 | 255.255.255.192 | 
 
 
-#### Get-IPv4Subnet
-The primary function for this tools set.  The function gets information about an IPv4 subnet based on an IP Address and a subnet mask or prefix length
-
-      CidrID       : 192.168.0.0/17
-      NetworkID    : 192.168.0.0
-      SubnetMask   : 255.255.128.0
-      PrefixLength : 17
-      HostCount    : 32766
-      FirstHostIP  : 192.168.0.1
-      LastHostIP   : 192.168.127.254
-      Broadcast    : 192.168.127.255
-
 #### Ping-IpRange
 Pings through the range of IP addresses based on the First and Last Address provided.
 
@@ -72,3 +73,4 @@ Pings through the range of IP addresses based on the First and Last Address prov
       192.168.0.20      True
       192.168.0.21      True
       192.168.0.24      True
+      
