@@ -1,13 +1,13 @@
 # briansworth.GetIPv4Address
-IP addressing, subnets and so much more
+The purpose of this module is to provide a network toolbox for reference and testing IP addressing, subnets and more.  Below is a list of the current functions and there outputs.  For more information about a function use `Get-Help Get-IPv4Subnet`
 
 - Get-IPv4Subnet
-- Get-SubnetCheatSheet 
-- Convert-NetMaskToCIDR
-- Convert-CIDRToNetMask
-- Add-IntToIPv4Address
-- Get-CidrFromHostCount
+- Add-IntToIPv4Address 
 - Convert-IPv4AddressToBinaryString
+- Convert-CIDRToNetMask
+- Convert-NetMaskToCIDR
+- Get-SubnetCheatSheet
+- Find-MTUSize
 - Ping-IpRange
 
 
@@ -23,24 +23,26 @@ The primary function for this tools set.  The function gets information about an
       FirstHostIP  : 192.168.0.1
       LastHostIP   : 192.168.127.254
       Broadcast    : 192.168.127.255
-      
-      
-#### Convert-IPv4AddressToBinaryString
-Converts an IP v4 Address to Binary String 
-
-    192.168.1.5 = 11000000101010000000000100000101
-
-
+ 
+ 
+ 
 #### Add-IntToIPv4Address
 Adds an integer to an IP Address and get the new IP Address.  This is helpful when you are trying to get a range.        An integer to add to the IP Address. Can be a positive or negative number.
 
 	10.10.0.252 + 100 = 10.10.1.96
 
 
+#### Convert-IPv4AddressToBinaryString
+Converts an IP v4 Address to Binary String 
+
+    192.168.1.5 = 11000000101010000000000100000101
+
+
 #### Convert-CIDRToNetMask
 Converts a CIDR to a netmask 
 
-    /26 = 255.255.255.192/26
+    /26 = 255.255.255.192
+
 
 #### Convert-NetMaskToCIDR 
 Converts a netmask to a CIDR
@@ -60,6 +62,15 @@ Creates a little cheatsheet for subnets to the console or send it to a file such
       28 |            14 |            16 | 255.255.255.240 | 
       27 |            30 |            32 | 255.255.255.224 | 
       26 |            62 |            64 | 255.255.255.192 | 
+
+
+
+#### Find-MTUSize
+Finds the MTU size being used on the network.
+
+ MTU
+ ---
+1500
 
 
 #### Ping-IpRange
