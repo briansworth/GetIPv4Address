@@ -1,6 +1,7 @@
-# briansworth.GetIPv4Address
-The purpose of this module is to provide a network toolbox for reference and testing IP addressing, subnets and more.  Below is a list of the current functions and there outputs.  For more information about a function use `Get-Help Get-IPv4Subnet`
+# GetIPv4Address
+I wanted a simple command that would give me the basic subnet information I commonly want. Identifying the Network ID was tedious, as was converting an IP / Subnet to CIDR notation and vice-versa. https://codeandkeep.com/PowerShell-Get-Subnet-NetworkID/
 
+Since that time it has grown to include: 
 - Get-IPv4Subnet
 - Add-IntToIPv4Address 
 - Convert-IPv4AddressToBinaryString
@@ -9,6 +10,8 @@ The purpose of this module is to provide a network toolbox for reference and tes
 - Get-SubnetCheatSheet
 - Find-MTUSize
 - Ping-IpRange
+
+Now the purpose of this module is to provide a network toolbox for reference and testing IP addressing, subnets and more.  For more information about any of the functions use the  `Get-Help` cmdlet.
 
 
 
