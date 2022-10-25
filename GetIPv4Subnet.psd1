@@ -9,7 +9,7 @@
 @{
 
 # Script module or binary module file associated with this manifest.
-RootModule = 'GetIPv4Subnet.psm1'
+RootModule = 'loader.psm1'
 
 # Version number of this module.
 ModuleVersion = '0.1.1'
@@ -66,7 +66,7 @@ Copyright = '(c) Brian Farnsworth. All rights reserved.'
 # FormatsToProcess = @()
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-NestedModules = @('.\Modules\IPv4PingRange.psm1','.\Modules\GetIPv4Subnet.psm1')
+NestedModules = 'Modules/GetIPv4Subnet.psm1','Modules/PingIpRange.psm1','Modules/TestMtuSize.psm1'
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = @(

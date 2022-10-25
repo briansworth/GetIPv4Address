@@ -1,5 +1,4 @@
-﻿#requires -Version 3.0 
-#-module ConvertIPv4ToInt, ConvertIntToIPv4, Add-IntToIPv4Address
+﻿#requires -Version 3.0 -module ConvertIPv4ToInt, ConvertIntToIPv4,Add-IntToIPv4Address
 function Ping-IpRange
 {
   <#
