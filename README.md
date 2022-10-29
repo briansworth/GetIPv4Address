@@ -1,15 +1,38 @@
-# briansworth.GetIPv4Address
-IP addressing, subnets and so much more
+# GetIPv4Address
+I wanted a simple command that would give me the basic subnet information I commonly want. Identifying the Network ID was tedious, as was converting an IP / Subnet to CIDR notation and vice-versa. https://codeandkeep.com/PowerShell-Get-Subnet-NetworkID/
 
+Since that time it has grown to include: 
 - Get-IPv4Subnet
-- Get-SubnetCheatSheet 
-- Convert-NetMaskToCIDR
-- Convert-CIDRToNetMask
-- Add-IntToIPv4Address
-- Get-CidrFromHostCount
+- Add-IntToIPv4Address 
 - Convert-IPv4AddressToBinaryString
+- Convert-CIDRToNetMask
+- Convert-NetMaskToCIDR
+- Get-SubnetCheatSheet
+- Find-MTUSize
 - Ping-IpRange
 
+Now the purpose of this module is to provide a network toolbox for reference and testing IP addressing, subnets and more.  For more information about any of the functions use the  `Get-Help` cmdlet.
+
+
+
+#### Get-IPv4Subnet
+The primary function for this tools set.  The function gets information about an IPv4 subnet based on an IP Address and a subnet mask or prefix length
+
+      CidrID       : 192.168.0.0/17
+      NetworkID    : 192.168.0.0
+      SubnetMask   : 255.255.128.0
+      PrefixLength : 17
+      HostCount    : 32766
+      FirstHostIP  : 192.168.0.1
+      LastHostIP   : 192.168.127.254
+      Broadcast    : 192.168.127.255
+ 
+ 
+ 
+#### Add-IntToIPv4Address
+Adds an integer to an IP Address and get the new IP Address.  This is helpful when you are trying to get a range.        An integer to add to the IP Address. Can be a positive or negative number.
+
+	10.10.0.252 + 100 = 10.10.1.96
 
 
 #### Convert-IPv4AddressToBinaryString
@@ -18,16 +41,11 @@ Converts an IP v4 Address to Binary String
     192.168.1.5 = 11000000101010000000000100000101
 
 
-#### Add-IntToIPv4Address
-Adds an integer to an IP Address and get the new IP Address.  This is helpful when you are trying to get a range.        An integer to add to the IP Address. Can be a positive or negative number.
-
-	10.10.0.252 + 100 = 10.10.1.96
-
-
 #### Convert-CIDRToNetMask
 Converts a CIDR to a netmask 
 
-    /26 = 255.255.255.192/26
+    /26 = 255.255.255.192
+
 
 #### Convert-NetMaskToCIDR 
 Converts a netmask to a CIDR
@@ -49,17 +67,16 @@ Creates a little cheatsheet for subnets to the console or send it to a file such
       26 |            62 |            64 | 255.255.255.192 | 
 
 
-#### Get-IPv4Subnet
-The primary function for this tools set.  The function gets information about an IPv4 subnet based on an IP Address and a subnet mask or prefix length
 
-      CidrID       : 192.168.0.0/17
-      NetworkID    : 192.168.0.0
-      SubnetMask   : 255.255.128.0
-      PrefixLength : 17
-      HostCount    : 32766
-      FirstHostIP  : 192.168.0.1
-      LastHostIP   : 192.168.127.254
-      Broadcast    : 192.168.127.255
+#### Find-MTUSize
+Finds the MTU size being used on the network.
+
+```
+MTU
+----
+1500
+```
+
 
 #### Ping-IpRange
 Pings through the range of IP addresses based on the First and Last Address provided.
@@ -72,3 +89,5 @@ Pings through the range of IP addresses based on the First and Last Address prov
       192.168.0.20      True
       192.168.0.21      True
       192.168.0.24      True
+      
+
