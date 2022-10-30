@@ -75,7 +75,7 @@ function Find-MTUSize
   }
   End{
     $MTU = [int]$Script:UpperBoundPacketSize + 28 # Add 28 to this number to account for 20 bytes for the IP header and 8 bytes for the ICMP Echo Request header
-    Remove-Variable -Name UpperBoundPacketSize -Scope Global # This just cleans up the variable since it was in the Global scope
+    Remove-Variable -Name UpperBoundPacketSize -Scope Script # This just cleans up the variable since it was in the Global scope
     
     New-Object -TypeName PSObject -Property @{
       MTU = $MTU
